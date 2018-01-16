@@ -1,8 +1,20 @@
+import messages from 'shared/messages';
+import * as properties from 'shared/settings/properties';
+
 export default class Completion {
   constructor(wrapper, store) {
     this.wrapper = wrapper;
     this.store = store;
     this.prevState = {};
+
+    browser.runtime.sendMessage({
+      type: messages.SETTINGS_QUERY,
+    }).then((settings) => {
+      this.backgroundColor = settings.properties.background
+        || properties.defaults.background;
+      this.foregroundColor = settings.properties.foreground
+        || properties.defaults.foreground;
+    });
 
     store.subscribe(() => {
       this.update();
@@ -29,6 +41,9 @@ export default class Completion {
 
         if (i === state.groupSelection && j === state.itemSelection) {
           li.classList.add('vimvixen-completion-selected');
+        } else {
+          li.style.backgroundColor = this.backgroundColor;
+          li.style.color = this.foregroundColor;
         }
       }
     }
