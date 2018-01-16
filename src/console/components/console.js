@@ -1,4 +1,5 @@
 import messages from 'shared/messages';
+import * as properties from 'shared/settings/properties';
 import * as consoleActions from 'console/actions/console';
 
 const inputShownMode = (state) => {
@@ -17,6 +18,18 @@ export default class ConsoleComponent {
     input.addEventListener('blur', this.onBlur.bind(this));
     input.addEventListener('keydown', this.onKeyDown.bind(this));
     input.addEventListener('input', this.onInput.bind(this));
+
+    browser.runtime.sendMessage({
+      type: messages.SETTINGS_QUERY,
+    }).then((settings) => {
+      let themed = doc.querySelectorAll('.vimvixen-console-command-theme');
+      themed.forEach(ele => {
+        ele.style.backgroundColor = settings.properties.background
+          || properties.defaults.background;
+        ele.style.color = settings.properties.foreground
+          || properties.defaults.foreground;
+      });
+    });
 
     store.subscribe(() => {
       this.update();
